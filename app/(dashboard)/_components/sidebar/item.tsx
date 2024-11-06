@@ -8,6 +8,8 @@ import {
 
 import { cn } from "@/lib/utils"
 
+import { Hint } from "@/components/hint"
+
 interface ItemProps{
     id: string,
     name: string,
@@ -34,7 +36,13 @@ export const Item = ({
 
     return (
         <div className="aspect-square relative">
-            <Image
+            <Hint
+                label={name}
+                side="right"
+                align="start"
+                sideOffset={18}
+            >
+             <Image
                 fill
                 alt={name}
                 src={imageUrl}
@@ -42,7 +50,9 @@ export const Item = ({
                 className={cn("rounded-md cursor-pointer opacity-75 hover:opacity-100",
                     isActive && "opacity-100"
                 )}
-            />
+            />   
+            </Hint>
+            
         </div>
     );
 };
