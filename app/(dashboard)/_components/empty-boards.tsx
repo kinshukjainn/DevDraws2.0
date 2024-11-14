@@ -7,20 +7,29 @@ import { useMutation } from "convex/react";
 import { useOrganization } from "@clerk/nextjs";
 
 import { api } from "@/convex/_generated/api";
+import { useApiMutation } from "@/hooks/use-api-mutations";
+import { toast } from "sonner";
 
 const EmptyBoards = () => {
 
-    const create = useMutation(api.board.Create)
+    const { mutate, pending } = useApiMutation(api.board.Create)
     const { organization } = useOrganization()
 
     const onClick = () => {
 
         if (!organization) return;
 
-        create({
+        mutate({
             orgId: organization.id,
             title: "Untitled"
         })
+            .then((id) => {
+                toast.success("Board Created")
+            })
+            //TODO: Redirect to board/{id}
+            .catch(() => {
+                toast.error("Failed to create board")
+            })
     }
 
     return (
@@ -45,6 +54,7 @@ const EmptyBoards = () => {
             </p>
             <div className="mt-6">
                 <Button
+                    disabled={pending}
                     onClick={onClick}
                     size="lg">
                     Create Board
