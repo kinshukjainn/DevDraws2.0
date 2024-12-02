@@ -11,7 +11,7 @@ export const useApiMutation = (mutationFunction: any) => {
         return apiMutation(payload)
             .finally(() => setPending(false))
             .then((result) => {
-                result
+                return result
             })
             .catch((error) => {
                 throw error

@@ -1,5 +1,7 @@
 "use client"
 
+import { useRouter } from "next/navigation";
+
 import { cn } from "@/lib/utils";
 import { Plus } from "lucide-react";
 
@@ -18,6 +20,8 @@ export const NewBoardButton = ({
     disabled
 }: NewBoardButtonProps) => {
 
+    const router = useRouter()
+
     const {mutate, pending} = useApiMutation(api.board.Create)
 
     const onClick = () => {
@@ -26,8 +30,9 @@ export const NewBoardButton = ({
             title: "Untitled"
         })
             .then((id) => {
-                toast.success("Board created")
-                // TODO: Redirect to "/board/{id}"
+                toast.success(`Board Created Successfully`)
+                // TODO: Redirect to "/boards/{id}"
+                router.push(`/boards/${id}`)
             })
             .catch(() => 
                 toast.error("Failed to create board")

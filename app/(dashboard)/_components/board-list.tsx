@@ -23,8 +23,11 @@ const BoardList = ({
     query
 }: BoardListProps) => {
 
-    // Pass the orgId to the Get query function
-    const data = useQuery(api.boards.Get, { orgId })
+    // Pass the OrgId and Search Query Params to the Get query function
+    const data = useQuery(api.boards.Get, {
+        orgId,
+        ...query
+    })
 
     // Data can only be undefined when it is in the loading phase
     if (data === undefined) {

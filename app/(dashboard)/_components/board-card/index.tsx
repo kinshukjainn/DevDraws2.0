@@ -15,6 +15,8 @@ import { api } from "@/convex/_generated/api";
 
 import { useAuth } from "@clerk/nextjs";
 import { toast } from "sonner";
+// import { useMutation } from "convex/react";
+// import { Id } from "@/convex/_generated/dataModel";
 
 interface BoardCardProps {
     id: string;
@@ -46,6 +48,10 @@ export const BoardCard = ({
         addSuffix: true
     })
 
+    // Using convex to manage favourites directly will loose the loading state property feature
+    // const handleFavourite = useMutation(api.board.Favourite)
+    // const handleUnfavourite = useMutation(api.board.Unfavourite)
+
     const {
         mutate: onFavourite,
         pending: pendingFavourite
@@ -58,9 +64,11 @@ export const BoardCard = ({
 
     const toggleFavourite = () => {
         if (isFavourite) {
+            // handleUnfavourite({ id: id as Id<"boards"> })
             onUnfavourite({ id })
                 .catch(() => toast.error("Failed to unfavourite"))
         } else {
+            // handleFavourite({ id: id as Id<"boards">, orgId })
             onFavourite({ id, orgId })
                 .catch(() => toast.error("Failed to favourite"))
         }
