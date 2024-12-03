@@ -21,7 +21,7 @@ export const Room = ({
 }: RoomProps) => {
   return (
     <LiveblocksProvider
-      publicApiKey={"pk_dev_Nzd_FNxJZ3MsekZ1wG7_gYi_1TfOhFk9AygbViQdSPO8Ir4L06TcAFpjIGZokvUe"}
+      authEndpoint={"/api/liveblocks-auth"}
     >
       <RoomProvider id={roomId}>
         <ClientSideSuspense
