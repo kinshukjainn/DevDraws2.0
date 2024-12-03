@@ -15,9 +15,7 @@ const BoardIdPage = ({
         <Room
             roomId={params.boardId}
             fallback={
-                <div>
-                    <Loading />
-                </div>
+                <Loading />
             }
         >
             <Canvas boardId={params.boardId} />
