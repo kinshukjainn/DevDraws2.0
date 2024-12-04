@@ -1,13 +1,38 @@
-import { Button } from "@/components/ui/button"
-import { UserButton, UserProfile } from "@clerk/nextjs";
+"use client"
 
-export default function Home() {
+import EmptyOrg from "./_components/empty-org";
+import BoardList from "./_components/board-list";
+
+import { useOrganization } from "@clerk/nextjs";
+
+interface DashboardPage{
+  searchParams: {
+    search?: string;
+    favourites?: string;
+  }
+}
+
+const DashboardPage = ({
+  searchParams
+}: DashboardPage) => {
+
+  const { organization } = useOrganization()
+
   return (
-    <div className="flex flex-col gap-y-4">
-      <div>You are logged in</div>
-      <span>
-        Rejoice
-      </span>
+    <div className="flex-1 h-[calc(100%-80px)] p-6">
+      {
+        !organization ? (
+          <EmptyOrg />
+        ) : (
+            <BoardList
+              orgId={organization.id}
+              query={searchParams}
+            />
+        )
+      }
+      
     </div>
   );
 }
+
+export default DashboardPage
