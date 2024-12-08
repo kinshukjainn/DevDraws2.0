@@ -109,11 +109,59 @@ export const Canvas = ({
 
     }, [lastUsedColor])
 
+    const translateSelectedLayers = useMutation((
+        { storage, self },
+        point: Point,
+    ) => {
+
+        if (canvasState.mode !== CanvasMode.Translating) {
+            return
+        }
+
+        const offset = {
+            x: point.x - canvasState.current.x,
+            y: point.y - canvasState.current.y
+        }
+
+        const liveLayers = storage.get("layers")
+
+        for (const id of self.presence.selection) {
+            const layer = liveLayers.get(id)
+
+            if (layer) {
+                layer.update({
+                    x: layer.get("x") + offset.x,
+                    y: layer.get("y") + offset.y
+                })
+            }
+        }
+
+        setCanvasState({
+            mode: CanvasMode.Translating,
+            current: point
+        })
+
+    }, [
+        canvasState
+    ])
+
+    const unselectLayers = useMutation((
+        { self, setMyPresence}
+    ) => {
+
+        if (self.presence.selection.length > 0) {
+            setMyPresence({
+                selection: []
+            }, { addToHistory: true })
+        }
+
+    }, [])
+
     const resizeSelectedLayer = useMutation((
         { storage, self },
         point: Point
     ) => {
-        
+
         if (canvasState.mode !== CanvasMode.Resizing) {
             return
         }
@@ -160,7 +208,12 @@ export const Canvas = ({
 
         // console.log(current)
 
-        if (canvasState.mode === CanvasMode.Resizing) {
+        if (canvasState.mode === CanvasMode.Translating) {
+            //    console.log("Translating") 
+            translateSelectedLayers(current)
+        }
+
+        else if (canvasState.mode === CanvasMode.Resizing) {
             // console.log("Resizing")
             resizeSelectedLayer(current)
         }
@@ -170,7 +223,8 @@ export const Canvas = ({
     }, [
         camera,
         canvasState,
-        resizeSelectedLayer
+        resizeSelectedLayer,
+        translateSelectedLayers
     ])
 
     const onPointersLeave = useMutation((
@@ -180,6 +234,31 @@ export const Canvas = ({
         setMyPresence({ cursor: null })
 
     }, [])
+
+    const onPointersDown = useCallback((
+        e: React.PointerEvent
+    ) => {
+
+        const point = pointerEventToCanvasPoint(e, camera)
+
+        if (canvasState.mode === CanvasMode.Inserting) {
+            return
+        }
+
+        // TODO: Add case for drawing later
+
+        //FIXME: Add feedback for users having only read access
+
+        setCanvasState({
+            origin: point,
+            mode: CanvasMode.Pressing
+        })
+
+    }, [
+        camera,
+        canvasState.mode,
+        setCanvasState,
+    ])
 
     const onPointersUp = useMutation((
         { },
@@ -193,13 +272,23 @@ export const Canvas = ({
         //     mode: canvasState.mode,
         // })
 
-        if (canvasState.mode === CanvasMode.Inserting) {
+        if (
+            canvasState.mode === CanvasMode.None ||
+            canvasState.mode === CanvasMode.Pressing
+        ) {
+            // console.log("Unselect")
+            unselectLayers()
+
+            setCanvasState({
+                mode: CanvasMode.None
+            })
+        } else if (
+            canvasState.mode === CanvasMode.Inserting
+        ) {
             insertLayer(canvasState.layerType, point)
         } else {
-            mode: CanvasMode.None
+            setCanvasState({ mode: CanvasMode.None })
         }
-
-        setCanvasState({ mode: CanvasMode.None })
 
         history.resume
 
@@ -208,6 +297,7 @@ export const Canvas = ({
         canvasState,
         history,
         insertLayer,
+        unselectLayers
     ])
 
     const onLayerPointerDown = useMutation((
@@ -291,6 +381,7 @@ export const Canvas = ({
                 onPointerMove={onPointersMove}
                 onPointerLeave={onPointersLeave}
                 onPointerUp={onPointersUp}
+                onPointerDown={onPointersDown}
             >
                 <g
                     style={{

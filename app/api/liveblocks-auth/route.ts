@@ -8,7 +8,7 @@ import { api } from "@/convex/_generated/api"
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!)
 
 const liveblocks = new Liveblocks({
-    secret: "sk_dev_2ednSuxGIxniQaoroOG4QeAtT2F67qXpJpPX720VRfX3x3hevTXVBGmqY_dDDKt7"
+    secret: (process.env.LIVEBLOCKS_SECRET_KEY!)
 })
 
 export async function POST(request: Request) {
@@ -37,15 +37,38 @@ export async function POST(request: Request) {
     //     userOrgId: authorization.orgId
     // })
 
-    //FIXME: Update a way to redirect unauthrorized users, as they are still able to see the board loading screen
+    //FIXME: Updated a way to redirect unauthrorized users, need to provide feedback to frontend
+    //TODO: Task on hold
     if (board?.orgId !== authorization.orgId) {
-        return new Response("Unauthorized Access", {
-            status: 403
-        })
-    } 
+        // return new Response("Partial Access Provided", {
+        //     status: 202
+        // })
+
+        const userInfo = {
+            name: user.firstName || user.lastName || "Teammate",
+            picture: user.imageUrl
+        }
+
+        const session = liveblocks.prepareSession(
+            user.id,
+            { userInfo: userInfo }
+        )
+
+        if (room) {
+            session.allow(room, session.READ_ACCESS)
+        }
+
+        const { status, body } = await session.authorize()
+
+        return new Response(body, {
+            status,
+            headers: { "X-User-Access": "read-only" },
+        });
+
+    }
 
     const userInfo = {
-        name: user.firstName || "Teammate",
+        name: user.firstName || user.lastName || "Teammate",
         picture: user.imageUrl
     }
 
@@ -66,6 +89,8 @@ export async function POST(request: Request) {
 
     // console.log("Session_Status", {status, body})
 
-    return new Response(body, {status})
-
+    return new Response(body, {
+        status,
+        headers: { "X-User-Access": "full-access" },
+    })
 }

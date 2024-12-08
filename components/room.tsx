@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 
 import {
   LiveblocksProvider,
@@ -22,6 +22,7 @@ export const Room = ({
   roomId,
   fallback
 }: RoomProps) => {
+
   return (
     <LiveblocksProvider
       authEndpoint={"/api/liveblocks-auth"}

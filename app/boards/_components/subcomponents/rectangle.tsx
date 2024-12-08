@@ -15,10 +15,10 @@ export const Rectangle = ({
     selectionColor
 }: RectangleProps) => {
 
-    console.log({
-        id,
-        layer
-    })
+    // console.log({
+    //     id,
+    //     layer
+    // })
 
     const { x, y, width, height, fill } = layer
 

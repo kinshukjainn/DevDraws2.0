@@ -9,6 +9,7 @@ export default function Loading() {
         height={120}
         alt="Logo"
         className="animate-pulse duration-700"
+        priority
       />
     </div>
   );
