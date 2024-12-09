@@ -25,6 +25,7 @@ import { Toolbar } from "./toolbar"
 import { LayerPreview } from "./layer-preview"
 import { SelectionBox } from "./selection-box"
 import { CursorsPresence } from "./cursors-presence"
+import { SelectionTools } from "./selection-tools"
 
 import { useStorage } from "@liveblocks/react"
 // import { useSelf } from "@liveblocks/react/suspense";
@@ -374,6 +375,10 @@ export const Canvas = ({
                 canUndo={canUndo}
                 undo={history.undo}
                 redo={history.redo}
+            />
+            <SelectionTools
+                camera={camera}
+                setLastUsedColor={setLastUsedColor}
             />
             <svg
                 className="h-[100vh] w-[100vw]"

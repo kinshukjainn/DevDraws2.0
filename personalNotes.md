@@ -78,3 +78,21 @@ export function pointerEventToCanvasPoint(
 This function takes a React.PointerEvent (which contains information about the pointer interaction) and the Camera object as input. It returns a Point object representing the position of the pointer on the canvas.
 
 e.clientX and e.clientY give the pointer coordinates relative to the browser window's viewport. Subtracting camera.x and camera.y respectively adjusts these coordinates to be relative to the canvas itself, considering the current pan offset. Math.round ensures the resulting coordinates are integers, which is usually necessary for pixel-based drawing.
+
+## How we are handling color change of layer
+
+```
+onClick={() => onClick(color)}
+```
+
+This line of code defines the onClick handler for a ColorButton component within the ColorPicker. Let's break it down:
+
+- **onClick={() => ...}**: This sets up an event handler that will be executed when the button is clicked. The arrow function () => ... creates a new function specifically for this button's click event. This is a common practice in React to prevent unwanted behavior and improve performance.
+
+- **onClick(color)**: This is the core of the event handler. When the button is clicked, it calls the onClick function that was passed down as a prop to the ColorButton component. Crucially, it passes the color object (representing the color of that specific button) as an argument to the onClick function. This tells the parent component which color has been selected.
+
+- **onChange={setFill}**: Due to triggering of onChange of ColorPicker along with a color passed down to it, it in turn triggers the _setFill_ mutation. _setFill_ updates the _fill_ property of the selected layers in the shared storage.
+
+- **canvas.tsx** re-renders the _LayerPreview_ components with the updated layer data.
+
+- **rectangle.tsx** receives the updated _fill_ color and applies it to the SVG **rectangle.tsx** element, visually changing the rectangle's color on the canvas.
